@@ -1,0 +1,534 @@
+-- SCRIPT DE APOIO - ESTRUTURAS E POVOAMENTO DAS TABELAS
+
+-- exclusão das tabelas, se necessário
+/*
+drop table veiculo_combustivel;
+drop table veiculo_acessorio;
+drop table veiculo;
+drop table modelo;
+drop table proprietario;
+drop table localidade;
+drop table cor;
+drop table marca;
+drop table acessorio;
+drop table combustivel; */
+
+-- criação das tabelas
+create table localidade
+(cd_localidade integer,
+nm_localidade varchar(50),
+constraint localidade_pk primary key (cd_localidade)
+);
+
+create table marca
+(cd_marca integer,
+ds_marca varchar(30),
+primary key (cd_marca)
+);
+
+create table combustivel
+(cd_combustivel integer,
+ds_combustivel varchar(30),
+primary key (cd_combustivel)
+);
+
+create table cor
+(cd_cor integer,
+ds_cor varchar(30),
+primary key (cd_cor)
+);
+
+create table acessorio
+(cd_acessorio integer,
+ds_acessorio varchar(50),
+primary key (cd_acessorio)
+);
+
+create table modelo
+(cd_modelo integer,
+cd_marca integer,
+ds_modelo varchar(50),
+primary key (cd_modelo)
+);
+alter table modelo
+add foreign key (cd_marca) references marca(cd_marca);
+
+create table proprietario
+(cd_proprietario integer,
+cd_localidade integer,
+nm_proprietario varchar(50),
+ds_logradouro varchar(50),
+ds_complemento varchar(50),
+ds_bairro varchar(50),
+nr_telefone varchar(15),
+ds_email varchar(50),
+sg_uf char(2),
+constraint proprietario_pk primary key (cd_proprietario),
+constraint proprietario_localidade_fk foreign key
+(cd_localidade) references localidade(cd_localidade)
+);
+
+create table veiculo
+(nr_placa char(7),
+cd_cor integer,
+cd_proprietario integer,
+cd_modelo integer,
+nr_ano_fab integer,
+nr_ano_mod integer,
+qt_km_rodado integer,
+qt_portas integer,
+ds_observacao varchar(100),
+constraint veiculo_pk primary key (nr_placa),
+constraint veiculo_cor_fk foreign key (cd_cor)
+references cor(cd_cor),
+constraint veiculo_modelo_fk foreign key (cd_modelo)
+references modelo(cd_modelo),
+constraint veiculo_proprietario_fk foreign key (cd_proprietario)
+references proprietario (cd_proprietario)
+);
+
+create table veiculo_acessorio
+(nr_placa char(7),
+cd_acessorio integer,
+constraint veiculo_acessorio_pk
+primary key (nr_placa, cd_acessorio),
+constraint veiculo_acessorio_placa_fk foreign key (nr_placa)
+references veiculo(nr_placa),
+constraint veiculo_acessorio_acessorio_fk foreign key (cd_acessorio)
+references acessorio(cd_acessorio)
+);
+
+create table veiculo_combustivel
+(cd_combustivel integer,
+nr_placa char(7),
+constraint veiculo_combustivel_pk
+primary key (cd_combustivel, nr_placa)
+);
+-- adicionando as FKs
+alter table veiculo_combustivel
+add constraint veic_combus_combustivel_fk
+foreign key (cd_combustivel)
+references combustivel(cd_combustivel);
+-- tabela veiculo precisa existir...
+alter table veiculo_combustivel
+add constraint veic_combus_placa_fk
+foreign key (nr_placa)
+references veiculo(nr_placa);
+
+
+INSERT INTO localidade (cd_localidade, nm_localidade) VALUES
+(1, 'São Paulo'),
+(2, 'Rio de Janeiro'),
+(3, 'Belo Horizonte'),
+(4, 'Porto Alegre'),
+(5, 'Curitiba'),
+(6, 'Brasília'),
+(7, 'Salvador'),
+(8, 'Fortaleza'),
+(9, 'Manaus'),
+(10, 'Belém'),
+(11, 'Recife'),
+(12, 'Goiânia'),
+(13, 'Campinas'),
+(14, 'São Luís'),
+(15, 'Natal'),
+(16, 'João Pessoa'),
+(17, 'Teresina'),
+(18, 'Campo Grande'),
+(19, 'Cuiabá'),
+(20, 'Maceió')
+;
+
+INSERT INTO marca (cd_marca, ds_marca) VALUES
+(1, 'Volkswagen'),
+(2, 'Chevrolet'),
+(3, 'Fiat'),
+(4, 'Ford'),
+(5, 'Toyota'),
+(6, 'Hyundai'),
+(7, 'Honda'),
+(8, 'Renault'),
+(9, 'Peugeot'),
+(10, 'Citroën'),
+(11, 'Kia'),
+(12, 'Nissan'),
+(13, 'Jeep'),
+(14, 'Mercedes-Benz'),
+(15, 'BMW'),
+(16, 'Audi'),
+(17, 'Mitsubishi'),
+(18, 'Subaru'),
+(19, 'Volvo'),
+(20, 'Lexus'),
+(21, 'JAC Motors'),
+(22, 'Chery'),
+(23, 'Land Rover'),
+(24, 'Porsche'),
+(25, 'Mini'),
+(26, 'Suzuki'),
+(27, 'Tesla'),
+(28, 'BYD'),
+(29, 'Ram'),
+(30, 'Dodge'),
+(31, 'Mazda'),
+(32, 'Great Wall'),
+(33, 'Geely'),
+(34, 'Scania'),
+(35, 'Iveco'),
+(36, 'Troller'),
+(37, 'Bugatti'),
+(38, 'Lamborghini'),
+(39, 'Ferrari'),
+(40, 'Jaguar'),
+(41, 'Pontiac'),
+(42, 'Buick'),
+(43, 'Lincoln'),
+(44, 'Daewoo'),
+(45, 'Rover'),
+(46, 'Smart'),
+(47, 'Opel'),
+(48, 'Seat'),
+(49, 'Saab'),
+(50, 'Alfa Romeo');
+
+
+INSERT INTO combustivel (cd_combustivel, ds_combustivel) VALUES
+(1, 'Gasolina'),
+(2, 'Etanol'),
+(3, 'Diesel'),
+(4, 'GNV'),
+(5, 'Elétrico'),
+(6, 'Híbrido');
+
+INSERT INTO cor (cd_cor, ds_cor) VALUES
+(1, 'Preto'), (2, 'Branco'), (3, 'Prata'), (4, 'Cinza'), (5, 'Vermelho'),
+(6, 'Azul'), (7, 'Verde'), (8, 'Amarelo'), (9, 'Marrom'), (10, 'Bege'),
+(11, 'Laranja'), (12, 'Rosa'), (13, 'Vinho'), (14, 'Grafite'), (15, 'Roxo'),
+(16, 'Azul Marinho'), (17, 'Branco Perolado'), (18, 'Preto Fosco'),
+(19, 'Cinza Chumbo'), (20, 'Prata Fosco'), (21, 'Azul Claro'), (22, 'Verde Oliva'),
+(23, 'Champanhe'), (24, 'Dourado'), (25, 'Antracite'), (26, 'Preto Metálico'),
+(27, 'Branco Neve'), (28, 'Azul Cobalto'), (29, 'Amarelo Ouro'),
+(30, 'Vermelho Ferrari'), (31, 'Verde Limão'), (32, 'Branco Gelo'),
+(33, 'Prata Polar'), (34, 'Bege Claro'), (35, 'Laranja Queimado'),
+(36, 'Cinza Titanium'), (37, 'Azul Royal'), (38, 'Preto Onix'),
+(39, 'Azul Oceano'), (40, 'Verde Esmeralda'), (41, 'Branco Puro'),
+(42, 'Azul Petróleo'), (43, 'Cinza Prata'), (44, 'Roxo Uva'), (45, 'Verde Militar'),
+(46, 'Azul Jeans'), (47, 'Vermelho Bordô'), (48, 'Bege Escuro'),
+(49, 'Cinza Lunar'), (50, 'Prata Diamante');
+
+INSERT INTO acessorio (cd_acessorio, ds_acessorio) VALUES
+(1, 'Ar-condicionado'), (2, 'Direção hidráulica'), (3, 'Trava elétrica'),
+(4, 'Vidro elétrico'), (5, 'Alarme'), (6, 'Sensor de estacionamento'),
+(7, 'Câmera de ré'), (8, 'Teto solar'), (9, 'Bancos de couro'), (10, 'GPS'),
+(11, 'Rodas de liga leve'), (12, 'Freio ABS'), (13, 'Airbag duplo'),
+(14, 'Controle de tração'), (15, 'Controle de estabilidade'),
+(16, 'Piloto automático'), (17, 'Volante multifuncional'), (18, 'Start-stop'),
+(19, 'Retrovisor elétrico'), (20, 'Sensor de chuva'), (21, 'Farol de neblina'),
+(22, 'Chave canivete'), (23, 'Computador de bordo'), (24, 'Painel digital'),
+(25, 'Rebatimento elétrico de espelhos'), (26, 'Som com bluetooth'),
+(27, 'Carregador USB'), (28, 'Banco com ajuste elétrico'),
+(29, 'Airbag lateral'), (30, 'Ar digital'), (31, 'Encosto de cabeça traseiro'),
+(32, 'Desembaçador traseiro'), (33, 'Sensor de fadiga'), (34, 'Freio de estacionamento eletrônico'),
+(35, 'Farol de LED'), (36, 'Luz diurna'), (37, 'Sistema Isofix'), (38, 'Porta-malas elétrico'),
+(39, 'Assistente de subida'), (40, 'Detector de ponto cego'), (41, 'Controle de velocidade'),
+(42, 'Assistente de permanência em faixa'), (43, 'Navegador integrado'),
+(44, 'Chave presencial'), (45, 'Head-up display'), (46, 'Espelhamento de smartphone'),
+(47, 'Recarregamento wireless'), (48, 'Reconhecimento de placas'),
+(49, 'Suspensão adaptativa'), (50, 'Assistente de frenagem');
+
+INSERT INTO modelo (cd_modelo, cd_marca, ds_modelo) VALUES
+(1, 1, 'Gol'), (2, 1, 'Polo'), (3, 1, 'T-Cross'), (4, 1, 'Nivus'), (5, 1, 'Virtus'),
+(6, 2, 'Onix'), (7, 2, 'Cruze'), (8, 2, 'Tracker'), (9, 2, 'S10'), (10, 2, 'Spin'),
+(11, 3, 'Uno'), (12, 3, 'Argo'), (13, 3, 'Cronos'), (14, 3, 'Mobi'), (15, 3, 'Strada'),
+(16, 4, 'Ka'), (17, 4, 'EcoSport'), (18, 4, 'Ranger'), (19, 4, 'Fusion'), (20, 4, 'Mustang'),
+(21, 5, 'Corolla'), (22, 5, 'Hilux'), (23, 5, 'Yaris'), (24, 5, 'RAV4'), (25, 5, 'SW4'),
+(26, 6, 'HB20'), (27, 6, 'Creta'), (28, 6, 'Tucson'), (29, 6, 'Santa Fe'), (30, 6, 'Accent'),
+(31, 7, 'Civic'), (32, 7, 'HR-V'), (33, 7, 'Fit'), (34, 7, 'City'), (35, 7, 'CR-V'),
+(36, 8, 'Sandero'), (37, 8, 'Logan'), (38, 8, 'Duster'), (39, 8, 'Kwid'), (40, 8, 'Captur'),
+(41, 9, '208'), (42, 9, '308'), (43, 9, '3008'), (44, 9, '5008'), (45, 9, 'Partner'),
+(46, 10, 'C3'), (47, 10, 'C4'), (48, 10, 'C4 Cactus'), (49, 10, 'C5 Aircross'), (50, 10, 'Berlingo');
+
+INSERT INTO proprietario (
+cd_proprietario, cd_localidade, nm_proprietario, ds_logradouro, ds_complemento, ds_bairro, nr_telefone, ds_email, sg_uf
+) VALUES
+(1, 1, 'Carlos Silva', 'Rua das Flores, 123', 'Apto 101', 'Jardim Primavera', '(11) 91234-5678', 'carlos.silva@email.com', 'SP'),
+(2, 2, 'Mariana Souza', 'Av. Brasil, 456', 'Casa', 'Centro', '(21) 99876-5432', 'mariana.souza@email.com', 'RJ'),
+(3, 3, 'Paulo Oliveira', 'Rua João Pessoa, 789', '', 'Bela Vista', '(31) 98765-4321', 'paulo.oliveira@email.com', 'MG'),
+(4, 4, 'Ana Pereira', 'Travessa das Acácias, 12', 'Bloco B', 'Vila Nova', '(41) 93456-7890', 'ana.pereira@email.com', 'PR'),
+(5, 5, 'Ricardo Santos', 'Rua das Palmeiras, 34', '', 'Jardim América', '(51) 92345-6789', null, 'RS'),
+(6, 6, 'Fernanda Costa', 'Av. Ipiranga, 567', 'Sala 2', 'Centro', '(61) 91234-5678', 'fernanda.costa@email.com', 'DF'),
+(7, 7, 'Bruno Lima', 'Rua das Laranjeiras, 890', 'Casa', 'Vila Velha', '(27) 99876-5432', 'bruno.lima@email.com', 'ES'),
+(8, 8, 'Juliana Rocha', 'Av. Amazonas, 1234', '', 'Santa Maria', '(71) 98765-4321', 'juliana.rocha@email.com', 'BA'),
+(9, 9, 'Gustavo Almeida', 'Rua Marechal Deodoro, 56', 'Apto 303', 'Centro', '(85) 93456-7890', 'gustavo.almeida@email.com', 'CE'),
+(10, 10, 'Isabela Martins', 'Av. Getúlio Vargas, 78', '', 'Jardim Europa', '(91) 92345-6789', 'isabela.martins@email.com', 'PA'),
+(11, 11, 'Thiago Ribeiro', 'Rua das Flores, 124', 'Casa', 'Jardim Primavera', '(11) 91234-5679', 'thiago.ribeiro@email.com', 'SP'),
+(12, 12, 'Patrícia Gomes', 'Av. Brasil, 457', 'Apto 202', 'Centro', '(21) 99876-5433', 'patricia.gomes@email.com', 'RJ'),
+(13, 13, 'Rodrigo Fernandes', 'Rua João Pessoa, 790', '', 'Bela Vista', '(31) 98765-4322', 'rodrigo.fernandes@email.com', 'MG'),
+(14, 14, 'Camila Dias', 'Travessa das Acácias, 13', 'Bloco A', 'Vila Nova', '(41) 93456-7891', 'camila.dias@email.com', 'PR'),
+(15, 15, 'Leonardo Castro', 'Rua das Palmeiras, 35', '', 'Jardim América', '(51) 92345-6790', 'leonardo.castro@email.com', 'RS'),
+(16, 16, 'Aline Moreira', 'Av. Ipiranga, 568', 'Sala 3', 'Centro', '(61) 91234-5679', 'aline.moreira@email.com', 'DF'),
+(17, 17, 'Felipe Barros', 'Rua das Laranjeiras, 891', 'Casa', 'Vila Velha', '(27) 99876-5434', 'felipe.barros@email.com', 'ES'),
+(18, 18, 'Marcela Nunes', 'Av. Amazonas, 1235', '', 'Santa Maria', '(71) 98765-4321', 'marcela.nunes@email.com', 'BA'),
+(19, 19, 'Eduardo Rocha', 'Rua Marechal Deodoro, 57', 'Apto 304', 'Centro', '(85) 93456-7891', 'eduardo.rocha@email.com', 'CE'),
+(20, 20, 'Larissa Alves', 'Av. Getúlio Vargas, 79', '', 'Jardim Europa', '(91) 92345-6790', null, 'PA'),
+(21, 1, 'Marcos Pinto', 'Rua das Flores, 125', '', 'Jardim Primavera', '(11) 91234-5680', 'marcos.pinto@email.com', 'SP'),
+(22, 2, 'Renata Cardoso', 'Av. Brasil, 458', 'Casa', 'Centro', '(21) 99876-5435', 'renata.cardoso@email.com', 'RJ'),
+(23, 3, 'André Vieira', 'Rua João Pessoa, 791', '', 'Bela Vista', '(31) 98765-4324', 'andre.vieira@email.com', 'MG'),
+(24, 4, 'Sabrina Mendes', 'Travessa das Acácias, 14', 'Bloco C', 'Vila Nova', '(41) 93456-7892', 'sabrina.mendes@email.com', 'PR'),
+(25, 5, 'Daniela Gomes', 'Rua das Palmeiras, 36', '', 'Jardim América', '(51) 92345-6791', 'daniela.gomes@email.com', 'RS'),
+(26, 6, 'Ricardo Azevedo', 'Av. Ipiranga, 569', 'Sala 4', 'Centro', '(61) 91234-5680', 'ricardo.azevedo@email.com', 'DF'),
+(27, 7, 'Jessica Santos', 'Rua das Laranjeiras, 892', 'Casa', 'Vila Velha', '(27) 99876-5436', 'jessica.santos@email.com', 'ES'),
+(28, 8, 'Marcos Carvalho', 'Av. Amazonas, 1236', '', 'Santa Maria', '(71) 98765-4325', 'marcos.carvalho@email.com', 'BA'),
+(29, 9, 'Paula Farias', 'Rua Marechal Deodoro, 58', 'Apto 305', 'Centro', '(85) 93456-7893', 'paula.farias@email.com', 'CE'),
+(30, 10, 'Felipe Ribeiro', 'Av. Getúlio Vargas, 80', '', 'Jardim Europa', '(91) 92345-6791', 'felipe.ribeiro@email.com', 'PA'),
+(31, 11, 'Carla Santana', 'Rua das Flores, 126', '', 'Jardim Primavera', '(11) 91234-5681', null, 'SP'),
+(32, 12, 'Roberto Lima', 'Av. Brasil, 459', 'Casa', 'Centro', '(21) 99876-5437', 'roberto.lima@email.com', 'RJ'),
+(33, 13, 'Adriana Silva', 'Rua João Pessoa, 792', '', 'Bela Vista', '(31) 98765-4326', 'adriana.silva@email.com', 'MG'),
+(34, 14, 'Júlio César', 'Travessa das Acácias, 15', 'Bloco D', 'Vila Nova', '(41) 93456-7893', 'julio.cesar@email.com', 'PR'),
+(35, 15, 'Flávia Teixeira', 'Rua das Palmeiras, 37', '', 'Jardim América', '(51) 92345-6792', 'flavia.teixeira@email.com', 'RS'),
+(36, 16, 'Anderson Melo', 'Av. Ipiranga, 570', 'Sala 5', 'Centro', '(61) 91234-5682', 'anderson.melo@email.com', 'DF'),
+(37, 17, 'Simone Barbosa', 'Rua das Laranjeiras, 893', 'Casa', 'Vila Velha', '(27) 99876-5438', 'simone.barbosa@email.com', 'ES'),
+(38, 18, 'Thiago Nascimento', 'Av. Amazonas, 1237', '', 'Santa Maria', '(71) 98765-4327', 'thiago.nascimento@email.com', 'BA'),
+(39, 19, 'Patrícia Almeida', 'Rua Marechal Deodoro, 59', 'Apto 306', 'Centro', '(85) 93456-7894', 'patricia.almeida@email.com', 'CE'),
+(40, 20, 'Victor Santos', 'Av. Getúlio Vargas, 81', '', 'Jardim Europa', '(91) 92345-6792', 'victor.santos@email.com', 'PA');
+
+INSERT INTO veiculo (
+nr_placa, cd_cor, cd_proprietario, cd_modelo, nr_ano_fab, nr_ano_mod,
+qt_km_rodado, qt_portas, ds_observacao
+) VALUES
+('ABC1234', 10, 5, 12, 2015, 2016, 80000, 4, NULL),
+('BCD2345', 22, 12, 30, 2018, 2019, 45000, 4, NULL),
+('CDE3456', 7, 7, 5, 2014, 2015, 120000, 2, NULL),
+('DEF4567', 15, 20, 25, 2019, 2019, 35000, 4, NULL),
+('EFG5678', 33, 3, 40, 2016, 2017, 70000, 4, NULL),
+('FGH6789', 40, 1, 48, 2020, 2020, NULL, 4, NULL),
+('GHI7890', 12, 18, 15, 2013, 2014, 110000, 2, NULL),
+('HIJ8901', 28, 25, 9, 2017, 2017, 60000, 4, NULL),
+('IJK9012', 8, 4, 21, 2015, 2016, 85000, 4, NULL),
+('JKL0123', 19, 37, 13, 2018, 2018, 40000, 4, 'Bom estado'),
+('KLM1234', 5, 29, 38, 2019, 2020, 30000, 2, NULL),
+('LMN2345', 25, 9, 7, 2014, 2015, 100000, 4, NULL),
+('MNO3456', 37, 13, 32, 2016, 2017, 75000, 4, NULL),
+('NOP4567', 44, 22, 45, 2020, 2021, 15000, 4, NULL),
+('OPQ5678', 14, 16, 19, 2013, 2014, 115000, 2, NULL),
+('PQR6789', 31, 8, 10, 2017, 2018, 55000, 4, NULL),
+('QRS7890', 9, 21, 28, 2015, 2016, 90000, 4, NULL),
+('RST8901', 13, 35, 37, 2019, 2019, 40000, 4, '4 pneus novos'),
+('STU9012', 21, 6, 23, 2018, 2019, 42000, 2, NULL),
+('TUV0123', 26, 30, 42, 2016, 2017, 68000, 4, NULL),
+('UVW1234', 11, 28, 8, 2014, 2015, 95000, 4, NULL),
+('VWX2345', 34, 15, 14, 2020, 2021, 20000, 4, NULL),
+('WXY3456', 18, 11, 20, 2017, 2018, 60000, 4, NULL),
+('XYZ4567', 39, 19, 6, 2013, 2014, 120000, 2, NULL),
+('YZA5678', 7, 24, 34, 2016, 2017, 72000, 4, NULL),
+('ZAB6789', 20, 32, 27, 2015, 2016, 88000, 4, NULL),
+('ABC7890', 23, 14, 17, 2018, 2019, 47000, 4, NULL),
+('BCD8901', 41, 27, 4, 2019, 2020, 32000, 4, NULL),
+('CDE9012', 16, 10, 31, 2013, 2014, 110000, 2, NULL),
+('DEF0123', 29, 36, 12, 2017, 2018, 54000, 4, NULL),
+('EFG1234', 10, 5, 22, 2014, 2015, 97000, 4, NULL),
+('FGH2345', 22, 12, 44, 2018, 2019, 46000, 4, NULL),
+('GHI3456', 7, 7, 3, 2013, 2014, 115000, 2, 'Financiado'),
+('HIJ4567', 15, 20, 18, 2019, 2019, 38000, 4, NULL),
+('IJK5678', 33, 3, 35, 2016, 2017, 69000, 4, NULL),
+('JKL6789', 40, 1, 46, 2020, 2020, NULL, 4, NULL),
+('KLM7890', 12, 18, 11, 2013, 2014, 105000, 2, NULL),
+('LMN8901', 28, 25, 26, 2017, 2017, 60000, 4, NULL),
+('MNO9012', 8, 4, 39, 2015, 2016, 83000, 4, 'Único dono'),
+('NOP0123', 19, 37, 16, 2018, 2018, 41000, 4, NULL),
+('OPQ1234', 5, 29, 36, 2019, 2020, 31000, 2, NULL),
+('PQR2345', 25, 9, 24, 2014, 2015, 102000, 4, NULL),
+('QRS3456', 37, 13, 41, 2016, 2017, 74000, 4, NULL),
+('RST4567', 44, 22, 47, 2020, 2021, 16000, 4, NULL),
+('STU5678', 14, 16, 29, 2013, 2014, 113000, 2, NULL),
+('QQQ2350', 5, 19, 24, 2004, 2005, 102000, 4, NULL),
+('RRR3460', 7, 23, 41, 2006, 2006, 177400, 4, NULL),
+('TTT4560', 4, 12, 47, 2010, 2010, 160000, 4, 'Passagem por leilão'),
+('VVV5670', 4, 26, 29, 2013, 2014, 113000, 2, NULL),
+('TUV6789', 31, 8, 43, 2017, 2018, 57000, 4, NULL);
+
+
+INSERT INTO veiculo_combustivel (cd_combustivel, nr_placa) VALUES
+(1, 'ABC1234'), (2, 'ABC1234'), (3, 'ABC1234'),
+(1, 'BCD2345'), (2, 'BCD2345'), (3, 'BCD2345'), (4, 'BCD2345'),
+(1, 'CDE3456'),
+(1, 'DEF4567'), (2, 'DEF4567'), (3, 'DEF4567'), (4, 'DEF4567'), (5, 'DEF4567'),
+(1, 'EFG5678'), (2, 'EFG5678'),
+(1, 'FGH6789'), (2, 'FGH6789'), (3, 'FGH6789'), (4, 'FGH6789'), (5, 'FGH6789'), (6, 'FGH6789'),
+(1, 'GHI7890'), (2, 'GHI7890'),
+(1, 'HIJ8901'), (2, 'HIJ8901'), (3, 'HIJ8901'),
+(1, 'IJK9012'), (2, 'IJK9012'), (3, 'IJK9012'), (4, 'IJK9012'),
+(1, 'JKL0123'),
+(1, 'KLM1234'), (2, 'KLM1234'), (3, 'KLM1234'),
+(1, 'LMN2345'), (2, 'LMN2345'), (3, 'LMN2345'), (4, 'LMN2345'), (5, 'LMN2345'),
+(1, 'MNO3456'), (2, 'MNO3456'), (3, 'MNO3456'),
+(1, 'NOP4567'), (2, 'NOP4567'), (3, 'NOP4567'), (4, 'NOP4567'), (5, 'NOP4567'), (6, 'NOP4567'),
+(1, 'OPQ5678'), (2, 'OPQ5678'),
+(1, 'PQR6789'),
+(1, 'QRS7890'), (2, 'QRS7890'), (3, 'QRS7890'), (4, 'QRS7890'),
+(1, 'RST8901'), (2, 'RST8901'), (3, 'RST8901'),
+(1, 'STU9012'), (2, 'STU9012'), (3, 'STU9012'), (4, 'STU9012'), (5, 'STU9012'),
+(1, 'TUV0123'), (2, 'TUV0123'),
+(1, 'UVW1234'), (2, 'UVW1234'), (3, 'UVW1234'), (4, 'UVW1234'), (5, 'UVW1234'), (6, 'UVW1234'),
+(1, 'VWX2345'), (2, 'VWX2345'),
+(1, 'WXY3456'), (2, 'WXY3456'), (3, 'WXY3456'),
+(1, 'XYZ4567'), (2, 'XYZ4567'), (3, 'XYZ4567'), (4, 'XYZ4567'),
+(1, 'YZA5678'), (2, 'YZA5678'), (3, 'YZA5678'),
+(1, 'ZAB6789'),
+(1, 'ABC7890'), (2, 'ABC7890'), (3, 'ABC7890'),
+(1, 'BCD8901'), (2, 'BCD8901'), (3, 'BCD8901'), (4, 'BCD8901'), (5, 'BCD8901'),
+(1, 'CDE9012'), (2, 'CDE9012'),
+(1, 'DEF0123'), (2, 'DEF0123'), (3, 'DEF0123'), (4, 'DEF0123'), (5, 'DEF0123'), (6, 'DEF0123');
+
+
+INSERT INTO veiculo_acessorio (nr_placa, cd_acessorio) VALUES
+('ABC1234', 12),
+('ABC1234', 25),
+('ABC1234', 11),
+('ABC1234', 18),
+('BCD2345', 7),
+('BCD2345', 19),
+('CDE3456', 3),
+('CDE3456', 28),
+('DEF4567', 14),
+('DEF4567', 36),
+('EFG5678', 22),
+('EFG5678', 45),
+('FGH6789', 4),
+('FGH6789', 27),
+('GHI7890', 11),
+('GHI7890', 40),
+('HIJ8901', 8),
+('HIJ8901', 33),
+('IJK9012', 6),
+('IJK9012', 18),
+('JKL0123', 10),
+('JKL0123', 42),
+('KLM1234', 5),
+('KLM1234', 31),
+('LMN2345', 17),
+('LMN2345', 39),
+('MNO3456', 2),
+('MNO3456', 24),
+('NOP4567', 9),
+('NOP4567', 7),
+('NOP4567', 35),
+('OPQ5678', 20),
+('OPQ5678', 43),
+('PQR6789', 1),
+('PQR6789', 32),
+('QRS7890', 13),
+('QRS7890', 26),
+('RST8901', 6),
+('RST8901', 21),
+('STU9012', 30),
+('STU9012', 50),
+('TUV0123', 7),
+('TUV0123', 38),
+('UVW1234', 23),
+('UVW1234', 44),
+('UVW1234', 4),
+('UVW1234', 14),
+('UVW1234', 24),
+('UVW1234', 34),
+('VWX2345', 15),
+('VWX2345', 41),
+('WXY3456', 2),
+('WXY3456', 48),
+('XYZ4567', 16),
+('XYZ4567', 29),
+('YZA5678', 19),
+('YZA5678', 47),
+('YZA5678', 10),
+('YZA5678', 9),
+('ZAB6789', 12),
+('ZAB6789', 34),
+('ABC7890', 3),
+('ABC7890', 20),
+('BCD8901', 8),
+('BCD8901', 37),
+('CDE9012', 4),
+('CDE9012', 13),
+('CDE9012', 40),
+('DEF0123', 9),
+('DEF0123', 46),
+('EFG1234', 5),
+('EFG1234', 25),
+('FGH2345', 14),
+('FGH2345', 43),
+('GHI3456', 6),
+('GHI3456', 31),
+('GHI3456', 3),
+('HIJ4567', 17),
+('HIJ4567', 39),
+('IJK5678', 10),
+('IJK5678', 28),
+('JKL6789', 22),
+('JKL6789', 36),
+('KLM7890', 1),
+('KLM7890', 18),
+('LMN8901', 7),
+('LMN8901', 33),
+('MNO9012', 11),
+('MNO9012', 49),
+('NOP0123', 15),
+('NOP0123', 40),
+('OPQ1234', 24),
+('OPQ1234', 35),
+('PQR2345', 3),
+('PQR2345', 26),
+('QRS3456', 9),
+('QRS3456', 42),
+('RST4567', 8),
+('RST4567', 27),
+('STU5678', 23),
+('STU5678', 45),
+('TUV6789', 16),
+('TUV6789', 50),
+('DEF4567', 17),
+('LMN8901', 42),
+('GHI3456', 36),
+('NOP0123', 9),
+('JKL0123', 30),
+('FGH6789', 49),
+('RST8901', 16),
+('IJK9012', 12),
+('OPQ5678', 25),
+('OPQ5678', 46),
+('BCD8901', 20),
+('DEF0123', 22),
+('DEF4567', 29),
+('KLM1234', 22),
+('CDE3456', 49),
+('CDE9012', 3),
+('VWX2345', 30),
+('EFG1234', 28),
+('NOP4567', 21),
+('GHI7890', 17),
+('VWX2345', 26),
+('BCD2345', 15),
+('YZA5678', 14),
+('JKL6789', 8),
+('KLM7890', 3),
+('JKL6789', 42),
+('QRS7890', 29),
+('PQR6789', 25),
+('YZA5678', 6),
+('ABC7890', 12),
+('EFG5678', 23),
+('TUV0123', 35),
+('TUV6789', 32),
+('VWX2345', 6),
+('CDE9012', 20),
+('DEF4567', 49),
+('RST8901', 13),
+('BCD2345', 31),
+('WXY3456', 46),
+('BCD8901', 14),
+('LMN8901', 20),
+('ABC1234', 34),
+('JKL6789', 40),
+('TUV6789', 47),
+('NOP0123', 25),
+('STU5678', 24),
+('STU5678', 40);
