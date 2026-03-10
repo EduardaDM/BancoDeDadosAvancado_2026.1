@@ -1,0 +1,84 @@
+-- Resolução da atividade em sala:
+
+-- a) Recuperar o(s) acessório(s) que não estão associado(s) 
+-- a nenhum veículo;
+
+SELECT ds_acessorio
+FROM acessorio
+WHERE cd_acessorio NOT IN (
+		SELECT DISTINCT cd_acessorio
+        FROM veiculo_acessorio);
+
+-- b) Listar a descrição do(s) acessório(s) mais popular 
+-- (que mais é encontrado entre os veículos cadastrados);
+
+SELECT ds_acessorio
+FROM acessorio
+WHERE cd_acessorio IN (
+    SELECT cd_acessorio
+    FROM veiculo_acessorio
+    GROUP BY cd_acessorio
+    HAVING COUNT(*) = (
+        SELECT MAX(contagem)
+        FROM (
+            SELECT COUNT(*) as contagem
+            FROM veiculo_acessorio
+            GROUP BY cd_acessorio
+        ) AS sub
+    )
+);
+
+
+-- c) Listar a descrição da marca que possui o maior número de 
+-- veículos cadastrado;
+
+SELECT ds_marca
+FROM marca
+WHERE  cd_marca = (
+		select cd_marca
+        from modelo
+        where cd_modelo in (select cd_modelo from veiculo)
+        group by cd_marca
+        order by count(*) desc
+        limit 1);
+        
+        
+-- d) Listar a descrição do combustível que apresenta o menor 
+-- número de veículos associado;
+
+SELECT ds_combustivel
+FROM combustivel
+WHERE cd_combustivel IN (
+    SELECT cd_combustivel
+    FROM veiculo_combustivel
+    GROUP BY cd_combustivel
+    HAVING COUNT(*) = (
+        SELECT MIN(contagem)
+        FROM (
+            SELECT COUNT(*) as contagem
+            FROM veiculo_combustivel
+            GROUP BY cd_combustivel
+        ) AS sub
+    )
+);
+
+-- e) Listar a(s) marca(s) e modelo(s) de veículo(s) movido(s) ao combustível 
+-- "Elétrico" e que apresenta(m) acessório "ADAS".
+
+SELECT ma.ds_marca, mo.ds_modelo
+FROM marca ma
+JOIN modelo mo ON ma.cd_marca = mo.cd_marca
+WHERE mo.cd_modelo IN (
+    SELECT v.cd_modelo
+    FROM veiculo v
+    WHERE v.nr_placa IN (
+        SELECT vc.nr_placa 
+        FROM veiculo_combustivel vc 
+        WHERE vc.cd_combustivel = (SELECT cd_combustivel FROM combustivel WHERE ds_combustivel = 'Elétrico')
+    )
+    AND v.nr_placa IN (
+        SELECT va.nr_placa 
+        FROM veiculo_acessorio va 
+        WHERE va.cd_acessorio IN (SELECT cd_acessorio FROM acessorio WHERE ds_acessorio LIKE '%ADAS%')
+    )
+);
