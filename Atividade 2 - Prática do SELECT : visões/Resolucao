@@ -1,0 +1,65 @@
+-- a)  Criação de uma view para listar a descrição da marca, 
+--     a descrição do modelo e a quantidade de veículos cadastrados;
+
+CREATE OR REPLACE VIEW vw_qtd_veiculos_modelo 
+AS
+SELECT m.ds_marca, mo.ds_modelo, COUNT(v.nr_placa) as total
+FROM marca m 
+JOIN modelo mo ON m.cd_marca = mo.cd_marca
+JOIN veiculo v ON mo.cd_modelo = v.cd_modelo
+GROUP BY m.ds_marca, mo.ds_modelo;
+
+SELECT * FROM vw_qtd_veiculos_modelo;
+
+-- b) Criação de uma view para listar dados completos dos veículos: placa, descrição da marca, 
+--    descrição do modelo, descrição dos acessórios e descrição do combustível que o move, 
+--    O resultado desta busca poderá resultar na repetição dos do veículo (placa, marca e modelo) 
+--    face a apresentação de mais de um combustível e/ou acessório;
+
+CREATE OR REPLACE VIEW vw_listar_dados_veiculo
+AS 
+SELECT v.nr_placa, ma.ds_marca, mo.ds_modelo, ace.ds_acessorio, comb.ds_combustivel
+FROM veiculo v
+JOIN modelo mo ON v.cd_modelo = mo.cd_modelo
+JOIN marca ma ON mo.cd_marca = ma.cd_marca
+JOIN veiculo_acessorio va ON v.nr_placa = va.nr_placa
+JOIN acessorio ace ON va.cd_acessorio = ace.cd_acessorio
+JOIN veiculo_combustivel vc ON v.nr_placa = vc.nr_placa
+JOIN combustivel comb ON vc.cd_combustivel = comb.cd_combustivel;
+
+SELECT * FROM vw_listar_dados_veiculo;
+
+-- c) Criação de uma view para listar o nome da localidade com a respectiva quantidade 
+--    proprietários associada (que residem na respectiva localidade);
+
+CREATE OR REPLACE VIEW vw_listar_proprietarios AS
+SELECT loc.nm_localidade, COUNT(prop.cd_proprietario) as total_proprietarios
+FROM localidade loc
+JOIN proprietario prop ON loc.cd_localidade = prop.cd_localidade
+GROUP BY loc.nm_localidade;
+
+SELECT * FROM vw_listar_proprietarios;
+
+-- d) Criação de uma view para listar a descrição do acessório (ace) com a respectiva quantidade 
+--    de veículos (va) associados a cada acessório listado;
+
+CREATE OR REPLACE VIEW vw_ds_qtd_acessorios AS 
+SELECT ace.ds_acessorio, COUNT(va.nr_placa) as total_carros_ace
+FROM acessorio ace
+LEFT JOIN veiculo_acessorio va ON ace.cd_acessorio = va.cd_acessorio
+GROUP BY ace.ds_acessorio;
+
+SELECT * FROM vw_ds_qtd_acessorios;
+
+-- e) Criação de uma view para listar a descrição do modelo, a descrição da marca, ano 
+--    do modelo e a respectiva cor de cada veículo;
+
+CREATE OR REPLACE VIEW vw_listar_detalhes_veiculo AS
+SELECT mo.ds_modelo, ma.ds_marca, v.nr_ano_mod, c.ds_cor
+FROM veiculo v 
+JOIN modelo mo ON v.cd_modelo = mo.cd_modelo 
+JOIN marca ma ON mo.cd_marca = ma.cd_marca
+JOIN cor c ON v.cd_cor = c.cd_cor;
+
+SELECT * FROM vw_listar_detalhes_veiculo;
+
