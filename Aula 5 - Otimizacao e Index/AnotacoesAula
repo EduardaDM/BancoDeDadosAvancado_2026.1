@@ -1,0 +1,51 @@
+-- exibe os inidices de uma determinada tabela 
+SHOW INDEXES FROM localidade;
+
+-- exibe os indices considerando filtros 
+SELECT st.'TABLE_NAME' AS tabela, st.INDEX_NAME AS indice, st.'COLUM_NAME' AS coluna, st.NON_UNIQUE AS unico
+FROM information_schema.STATISTICS st
+WHERE st.TABLE_SCHEMA = 'base_ceps_brasil';
+
+EXPLAIN SELECT * 
+FROM localidade l
+WHERE l.nm_localidade = 'blumenau';
+
+-- criando um indice p a coluna "nm_localidade"
+CREATE INDEX nm_localidade_idx ON localidade (nm_localidade);
+
+CREATE UNIQUE INDEX localidade_nr_cep_idx ON localidade(nr_cep);
+
+EXPLAIN SELECT lg.tp_logradouro, lg.nm_logradouro, lg.cd_bairro_inicio, lg_cd_localidade, lg.sg_uf, lg.nr_cep
+FROM logradouro lg
+WHERE lg.nr_cep = '89062200';
+
+-- 3 tabelas no fron ent 2 joins
+EXPLAIN 
+SELECT lg.tp_logradouro, lg.nm_logradouro, b.nm_bairro, loc.nm_localidade, lg.sg_uf, lg.nr_cep
+FROM logradouro lg
+JOIN bairro b ON lg.cd_bairro_inicio = b.cd_bairro
+JOIN localidade loc ON lg.cd_localidade = loc.cd_localidade 
+WHERE lg.sg_uf = 'SC';
+-- WHERE loc.nm_localidade = 'blumenau';
+-- WHERE lg.nr_cep = '89062200';
+
+CREATE INDEX logradouro_cd_bairro_idx ON logradouro(cd_bairro_inicio);
+CREATE INDEX logradouro_cd_localidade ON logradouro(cd_localidade);
+CREATE INDEX logradouro_nr_cep_idx ON logradouro(nr_cep);
+CREATE INDEX logradouro_sg_uf_idx ON logradouro(sg_uf);
+-- eliminando
+DROP INDEX logradouro_sg_uf_idx ON logradouro;
+
+SHOW INDEXES FROM logradouro;
+
+-- ////////////////////////////////////////////////////////////////
+-- vamos comecar a eliminar o ALL de grande_usuario
+DESC grande_usuario;
+
+SELECT gu.nm_grande_usuario, lg.nm_logradouro_comp, ba.nm_bairro, lo.nm_localidade, gu.sg_uf
+FROM grande_usuario gu JOIN localidade lo ON (gu.cd_localidade = lo.cd_localidade)
+							  JOIN bairro ba ON (gu.cd_bairro = ba.cd_bairro)
+							  JOIN logradouro lg ON (gu.cd_logradouro = lg.cd_logradouro)
+WHERE lo.nm_localidade = 'blumenau';
+
+
