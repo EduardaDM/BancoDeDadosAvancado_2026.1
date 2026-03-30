@@ -1,0 +1,76 @@
+-- utilizando mesma base da aula passada (com alguns indices já criados)
+-- enviado para prof print com os EXPLAIN rodando em arq pdf
+
+-- criando index extras
+CREATE INDEX idx_loc_nome ON localidade(nm_localidade);
+CREATE INDEX idx_log_uf ON logradouro(sg_uf);
+CREATE INDEX idx_log_bairro ON logradouro(cd_bairro_inicio);
+
+-- ATIVIDADE 3
+-- a. logradouros de blumenau, bairro e cep ordenado
+explain 
+select lg.nm_logradouro, b.nm_bairro, lg.nr_cep
+from logradouro lg
+join bairro b on lg.cd_bairro_inicio = b.cd_bairro
+join localidade loc on lg.cd_localidade = loc.cd_localidade
+where loc.nm_localidade = 'Blumenau'
+order by b.nm_bairro asc, lg.nm_logradouro asc; 
+-- asc com virgula faz organizar tanto em ordem alf. os bairros
+-- como tambem as ruas dentro do bairro
+
+-- b. distritos 'D' em SC
+EXPLAIN
+SELECT loc.nm_localidade AS distrito, 
+	   loc.nm_localidade AS municipio 
+FROM localidade loc
+join localidade l on loc.cd_localidade_sub = l.cd_localidade
+WHERE loc.fl_tipo_localidade = 'D' AND loc.sg_uf = 'SC'
+ORDER BY loc.nm_localidade ASC, l.nm_localidade asc;
+
+-- c. lista bairro floripa com quantidade de cep
+desc bairro;
+desc localidade;
+
+EXPLAIN
+SELECT b.nm_bairro, COUNT(lg.nr_cep) AS quantidade_ceps
+FROM logradouro lg
+JOIN bairro b ON lg.cd_bairro_inicio = b.cd_bairro
+JOIN localidade loc ON lg.cd_localidade = loc.cd_localidade
+WHERE loc.nm_localidade = 'Florianópolis'
+GROUP BY b.nm_bairro
+ORDER BY quantidade_ceps DESC;
+
+-- d. listar municipios com mais de uma uf 
+EXPLAIN
+SELECT nm_localidade, COUNT(DISTINCT sg_uf) AS qtd_ufs
+FROM localidade
+GROUP BY nm_localidade
+HAVING qtd_ufs > 1
+ORDER BY qtd_ufs DESC; 
+-- O DESC no fim garante que o 'mais popular' apareça no topo
+
+-- e. listar nmr total de ceps em cada municipio
+EXPLAIN
+SELECT loc.nm_localidade, loc.sg_uf, COUNT(lg.nr_cep) AS total_ceps
+FROM logradouro lg
+JOIN localidade loc ON lg.cd_localidade = loc.cd_localidade
+GROUP BY loc.nm_localidade, loc.sg_uf
+HAVING total_ceps > 1
+ORDER BY total_ceps DESC;
+
+-- f. Logradouro mais popular do Brasil (com tratamento de empate)
+
+-- Criar índice no nome do logradouro para performance
+CREATE INDEX idx_log_nm_popular ON logradouro(nm_logradouro);
+
+EXPLAIN
+SELECT nm_logradouro, COUNT(DISTINCT cd_localidade) AS n_municipios
+FROM logradouro
+GROUP BY nm_logradouro
+HAVING n_municipios = (
+    SELECT COUNT(DISTINCT cd_localidade) AS max_freq
+    FROM logradouro
+    GROUP BY nm_logradouro
+    ORDER BY max_freq DESC
+    LIMIT 1
+);
