@@ -1,0 +1,32 @@
+
+-- criando um gatilho
+-- ajustando o caracter terminador de insrucao para $$
+-- create or replace trigger tg_inserindo_pessoa
+delimiter $$ 
+create trigger tg_inserindo_pessoa
+after insert on pessoa for each row 
+begin 
+	insert into registro_log(dt_op,hr_,ds_op)
+    values (curdate(),curtime(),concat("Inserindo row pessoa id: ",new.id));
+end $$
+
+-- create or replace trigger tg_inserindo_pessoa
+-- como minha versao do mysql nao esta atualizada, fazer drop e create dnv
+drop trigger tg_inserindo_pessoa;
+delimiter $
+create trigger tg_alterando_pessoa
+after insert on pessoa for each row 
+begin 
+if old.nome <> new.nome then
+	insert into registro_log(dt_op,hr_,ds_op)
+		values (curdate(),curtime(),concat('Alterando row pessoa id: 
+		 para: ',new.nome));
+end $
+-- values (curdate(),curtime(),concat('Alterando row pessoa id:', old.id,' para: ',new.id));
+
+  -- inserindo dados em pesszoa e testando o gatilho:
+insert into pessoa(id, nome, email) 
+	values (1,'pessoa 1', 'pessoa@gmail.com');
+
+update pessoa set id=11 where id=1;  
+
