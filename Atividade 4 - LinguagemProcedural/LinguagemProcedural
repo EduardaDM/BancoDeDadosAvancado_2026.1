@@ -1,0 +1,58 @@
+-- sp_atualiza_estoque_med
+delimiter $
+CREATE OR REPLACE PROCEDURE sp_atualiza_estoque_med ()
+BEGIN
+	UPDATE medicamento m  -- será modificada essa tabela
+	SET qt_estoque = (SELECT SUM(l.qt_lote)  -- 
+							FROM lotemedicamento l
+							WHERE m.cd_medicamento = l.cd_medicamento
+							AND l.st_lote = 'A')
+							WHERE EXISTS (
+							SELECT 1
+							FROM lotemedicamento l
+							WHERE l.cd_medicamento = m.cd_medicamento);
+END $
+ 
+ 
+-- rotina para baixar de estoque medicamento vendido considerando a qtde em cada lote sendo que devem ser baixados as qtdes dos lotes mais------ proximos do vencimento;
+CREATE OR REPLACE PROCEDURE sp_baixa_estoque_med(IN p_med INT,
+																 IN p_qtde INt
+BEGIN 
+	 DECLARE v_controle INT DEFAULT 1;
+    DECLARE v_cd_lote INT;
+    DECLARE v_qt_lote INT;
+    DECLARE v_restante INT;
+ 
+	 DECLARE cur_lotes CURSOR FOR 
+        SELECT l.cd_lote, l.qt_lote
+        FROM lotemedicamento l
+        WHERE l.cd_medicamento = p_med
+          AND l.st_lote = 'A' 
+          AND l.qt_lote > 0
+        ORDER BY l.dt_validade ASC; -- ordena para o vencimento mais proximo ser
+	 DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_controle = 0; -- parar quando os lote acabarem
+	 SET v_restante = p_qtde;
+	 OPEN cur_lotes;
+	 loop_baixa: LOOP
+        FETCH cur_lotes INTO v_cd_lote, v_qt_lote;
+        -- Condição de saída: acabou o estoque dos lotes ou a quantidade da venda já zerou
+        IF v_controle = 0 OR v_restante <= 0 THEN
+            LEAVE loop_baixa;
+        END IF;
+        -- CASO 1: O lote atual cobre tudo o que falta para a venda
+        IF v_qt_lote >= v_restante THEN
+            UPDATE lotemedicamento 
+            SET qt_lote = qt_lote - v_restante
+            WHERE cd_lote = v_cd_lote;
+            SET v_restante = 0; -- Venda totalmente atendida
+        -- CASO 2: O lote atual não cobre tudo
+        ELSE
+            SET v_restante = v_restante - v_qt_lote; -- Deduz o que o lote tinha
+            UPDATE lotemedicamento 
+            SET qt_lote = 0 -- Zera este lote
+            WHERE cd_lote = v_cd_lote;
+        END IF;
+ 
+    END LOOP loop_baixa;
+    CLOSE cur_lotes;
+END $
