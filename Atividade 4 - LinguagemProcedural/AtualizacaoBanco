@@ -1,0 +1,65 @@
+-- Funções Numéricas
+SELECT ABS(-10);
+SELECT CEIL(4.2);
+SELECT FLOOR(4.8);
+SELECT ROUND(3.14159, 2);
+SELECT TRUNCATE(3.14159, 2);
+SELECT MOD(10, 3);
+SELECT POWER(2, 3);
+SELECT RAND();
+ 
+-- funções string
+SELECT LENGTH('Olá');
+SELECT CHAR_LENGTH('Olá');
+SELECT CONCAT('Maria', ' ', 'DB');
+SELECT LOWER('MARIADB');
+SELECT UPPER('locação');
+SELECT TRIM(' teste ');
+SELECT SUBSTRING('patinete', 2, 3);
+SELECT REPLACE('patinete azul', 'azul', 'vermelho');
+SELECT INSTR('patinete', 'ne');
+ 
+-- funções datas/hora
+SELECT NOW();
+SELECT CURDATE();
+SELECT CURTIME();
+SELECT DATE_ADD('2025-04-10', INTERVAL 7 DAY);
+SELECT DATEDIFF('2025-04-10', '2025-04-01');
+SELECT YEAR('2025-04-10');
+SELECT MONTH('2025-04-10');
+SELECT DAY('2025-04-10');
+SELECT DAYOFWEEK('2025-04-10');
+SELECT TIME_TO_SEC('01:30:00');
+SELECT SEC_TO_TIME(5400);
+ 
+SELECT NOW();
+select ADDDATE(CURDATE(),60);
+SELECT dayofweek(CURDATE()+1);
+SELECT DATEDIFF(CURDATE(),'1974-04-06');
+SELECT DATE_FORMAT("2017-06-15", "%d %m %Y");
+SELECT DATE_FORMAT(CURDATE(),'%W,%M of %Y'); 
+
+SELECT CONCAT('Banco',' de',' Dados');
+SELECT INSERT('Banco Dados',7,2,'de');
+SELECT INSTR('Banco de Dados', 'Dados');
+SELECT LCASE('Banco de Dados');
+SELECT Lower('Banco de Dados');
+SELECT UCASE('Banco de Dados');
+SELECT upper('Banco de Dados');
+SELECT TRIM(' Banco de Dados ');
+SELECT LTRIM(' Banco de Dados ');
+SELECT RTRIM(' Banco de Dados ');
+
+-- Aula 04/05
+-- Categoria de Produto (com margem de lucro)
+CREATE TABLE Categoria (
+    cd_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nm_categoria VARCHAR(100) NOT NULL,
+    pc_margem_lucro DECIMAL(5,2) DEFAULT 0.00  -- percentual de margem
+);
+ 
+-- Vinculando ao medicamento:
+ALTER TABLE Medicamento
+ADD cd_categoria INT,
+ADD FOREIGN KEY (cd_categoria) REFERENCES Categoria(cd_categoria);
+
