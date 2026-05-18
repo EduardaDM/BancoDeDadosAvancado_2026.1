@@ -1,0 +1,60 @@
+-- ABAIXO PRIVILÉGIOS DE OBJETO------------------------
+
+-- alterando senha do user
+ALTER USER root
+IDENTIFIED BY 'senha';
+
+
+-- criando usuario
+CREATE USER 'user1'
+IDENTIFIED BY 'user1';
+
+
+-- verificaro o user usado no momento
+select user();
+
+
+-- concedendo privilégio a coluna
+GRANT SELECT ON banco_auto.modelo TO 'user1';
+
+
+-- verificando os privilégios
+SHOW GRANTS FOR 'user1';
+
+-- concedendo privilégio de select
+GRANT SELECT(tipo, valor)
+ON banco_auto.modelo TO 'user1';
+
+
+
+-- concedendo privilégio de insert em modelo
+GRANT INSERT ON banco_auto.modelo TO 'user1';
+
+
+-- ABAIXO PRIVILÉGIOS DE SISTEMA ------------------------
+
+
+-- concedendo privilégio de sistema (create)
+-- o user concedido deve reiniciar sua conexão para usar seus priv.
+GRANT CREATE ON banco_auto.* TO 'user1';
+
+-- revogando privilégio
+REVOKE CREATE ON banco_auto FROM 'user1';
+
+-- roles
+
+-- criando um papél (role)
+CREATE ROLE ROLE1;
+
+-- concedendo privilégio a role1
+GRANT INSERT, DELETE, UPDATE
+ON banco_auto.modelo TO ROLE1;
+
+-- associando role1 para usuário 'user1'
+GRANT ROLE1
+TO 'user1';
+
+
+-- além disso, settar a role como default
+SET DEFAULT ROLE ROLE1
+FOR 'user1';
