@@ -1,0 +1,33 @@
+-- zerando estoque dos medicamentos
+update Medicamento set qt_estoque = 0 where 1=1;
+ 
+CREATE TABLE LoteMedicamento (
+cd_lote INT AUTO_INCREMENT,
+cd_medicamento INT NOT NULL,
+nr_lote VARCHAR(50) NOT NULL,
+dt_fabricacao DATE,
+dt_validade DATE NOT NULL,
+qt_lote INT NOT NULL DEFAULT 0,
+vl_custo_lote DECIMAL(8,2),
+st_lote CHAR(1) DEFAULT 'A', -- (A)tivo (V)encido (E)sgotado (B)loqueado
+PRIMARY KEY (cd_lote),
+FOREIGN KEY (cd_medicamento)
+        REFERENCES Medicamento(cd_medicamento)
+);
+ 
+INSERT INTO LoteMedicamento
+(cd_medicamento, nr_lote, dt_fabricacao, dt_validade, qt_lote, vl_custo_lote)
+VALUES
+(1,'BEN2025001','2025-01-10','2026-01-10',20,5.00),
+(1,'BEN2025002','2025-03-15','2026-07-15',15,5.20),
+(2,'ASP2025001','2025-02-01','2026-02-01',30,7.00),
+(2,'ASP2024009','2024-01-01','2026-09-01',5,6.90),
+(3,'DER2025001','2025-04-01','2027-04-01',40,20.00),
+(3,'DER2025002','2025-04-15','2026-05-20',8,19.50),
+(4,'CAT2025001','2025-03-10','2026-12-10',25,10.00),
+(5,'REM2025001','2025-01-20','2026-01-20',18,35.00),
+(6,'BGE2025001','2025-02-15','2026-11-15',50,9.00),
+(7,'DGE2025001','2025-03-01','2026-08-01',12,50.00),
+(8,'VOD2025001','2025-04-01','2027-04-01',22,21.20),
+(9,'VIC2025001','2025-02-01','2026-02-01',60,11.50),
+(10,'DOR2025001','2025-01-01','2026-05-25',7,9.90);
