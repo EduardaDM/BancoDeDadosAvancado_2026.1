@@ -1,0 +1,33 @@
+-- aula dia 18/05
+
+delimiter $
+create or replace procedure sp_atualiza_preco 
+(in p_ini decimal(8,2), in p_fim decimal(8,2), in p_percentual decimal(4,1))
+begin 
+	declare v_controle in default 1;-- controle do cursor
+    declare v_custo decimal(8,2);-- recebe o preco do medc
+    declare v_preco_ajustado decimal(8,2);-- manter o novo preco do medc
+    declare v_medicamento int; -- recebe o id do medc
+-- criando cursor
+declare cur_medicamentos cursor for select m.cd_medicamento, m.vl_custo 
+										from medicamento m 
+                                        where m.vl_custo between p_ini and p_fim;
+-- declarando o tratamento para o fim do cursor, acabou muda para 0
+declare continue handler for not found set v_controle = 0;
+open cur_medicamento 
+loop_med: loop
+-- atribuindo valores das colunas para as variaveis 
+	fetch cur_medicamentos into v_medicamentos, v_custo; -- atribuindo valores das colunas ass variaveis
+-- testando se fim da estrutura (dados do cursor)
+		if v_controle - 0 then 
+			leave loop_med; -- interrompe o loop/laco
+		end if;
+    -- ajustando o preco do medicamento
+		set v_preco_ajustado = (v_custo -  (v_custo * p_percentual/100);
+		update medicamento m et m.vl_venda = v_preco_ajustado 
+							where m.cd_medicamento = v_medicamento; -- para cada medc obtido do cursor
+    end loop;
+	close cur_medicamentos; -- fechamento do crsor(desloca estrutura da memoria)
+	end $	
+    call sp_atualiza_preco(10,40,50); 
+    select *from medicamento where vl_custo between 10 and 30;[
