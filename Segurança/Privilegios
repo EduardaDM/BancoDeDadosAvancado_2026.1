@@ -1,0 +1,33 @@
+CREATE USER 'administrador'
+IDENTIFIED BY 'administrador';
+
+CREATE USER 'recepcionista'
+IDENTIFIED BY 'recepcionista';
+
+CREATE USER 'veterinario'
+IDENTIFIED BY 'veterinario';
+
+CREATE ROLE controleTotal
+GRANT ALL PRIVILEGES ON bd_teste.* TO controleTotal;
+GRANT controleTotal
+TO 'administrador';
+SET DEFAULT ROLE controleTotal
+FOR 'administrador';
+
+CREATE ROLE controleAnimal;
+GRANT INSERT, DELETE, UPDATE ON bd_teste.animal TO controleAnimal;
+GRANT SELECT ON bd_teste.atendimento TO controleAnimal;
+GRANT controleAnimal
+TO 'recepcionista';
+SET DEFAULT ROLE controleAnimal
+FOR 'recepcionista';
+
+CREATE ROLE controleAtendimento;
+GRANT INSERT, DELETE, UPDATE ON bd_teste.atendimento TO controleAtendimento;
+GRANT SELECT ON bd_teste.animal TO controleAtendimento;
+GRANT SELECT ON bd_teste.tutor TO controleAtendimento;
+GRANT controleAtendimento
+TO 'veterinario';
+SET DEFAULT ROLE controleAtendimento
+FOR 'veterinario';
+
